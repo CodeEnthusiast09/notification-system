@@ -1,0 +1,31 @@
+{
+  "name": "notification-system",
+  "version": "1.0.0",
+  "description": "HNG Task 4 - Distributed Notification System with Microservices",
+  "workspaces": [
+    "services/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "setup": "bash infrastructure/scripts/setup.sh",
+    "dev": "docker-compose up",
+    "dev:build": "docker-compose up --build",
+    "down": "docker-compose down",
+    "clean": "bash infrastructure/scripts/cleanup.sh",
+    "logs": "docker-compose logs -f",
+    "gateway": "cd services/api-gateway && npm run dev",
+    "email": "cd services/email-service && npm run start:dev",
+    "user": "cd services/user-service && npm run start:dev",
+    "push": "cd services/push-service && python main.py",
+    "template": "cd services/template-service && python main.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+ 
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CodeEnthusiast09/notification-system/issues"
+  },
+  "homepage": "https://github.com/CodeEnthusiast09/notification-system#readme"
+}
