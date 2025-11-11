@@ -21,7 +21,8 @@ class TemplateUpdate(BaseModel):
     body: Optional[str] = None
     title: Optional[str] = None
     variables: Optional[List[str]] = None
-    is_active: Optional[bool] = None
+    # is_active: Optional[bool] = None
+    language: Optional[str] = None
 
 
 class TemplateResponse(BaseModel):
@@ -72,6 +73,6 @@ class ApiResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     service: str
-    timestamp: datetime
+    timestamp: str
     database_connected: bool
     redis_connected: bool

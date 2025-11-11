@@ -1,8 +1,3 @@
-"""
-Template Service Routes
-Handles HTTP endpoints for template management
-"""
-
 from src.utils import extract_variables, render_template
 from src.services import state
 from src.models import TemplateRepository
@@ -291,4 +286,88 @@ async def update_template(
         raise
     except Exception as e:
         logger.error(f"Failed to update template: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/templates/{template_code}/versions")
+async def get_template_versions(
+    template_code: str,
+    language: str = "en",
+    db: AsyncSession = Depends(get_db),
+):
+    """Get version history for a template"""
+    try:
+        # Get all versions of the template for the specified language
+        versions = await TemplateRepository.get_all_versions(
+            db, template_code, language
+        )
+
+        if not versions:
+            raise HTTPException(status_code=404, detail="Template not found")
+
+        # Format response data
+        data = [
+            {
+                "id": t.id,
+                "version": t.version,
+                "name": t.name,
+                "is_active": t.is_active,
+                "created_at": t.created_at.isoformat(),
+                "updated_at": t.updated_at.isoformat(),
+                "created_by": t.created_by,
+            }
+            for t in versions
+        ]
+
+        return {
+            "success": True,
+            "data": data,
+            "message": "Version history retrieved successfully",
+            "meta": {
+                "total_versions": len(data),
+                "active_version": next(
+                    (v["version"] for v in data if v["is_active"]), None
+                ),
+            },
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get version history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/templates/{template_code}/versions/{version}")
+async def get_specific_version(
+    template_code: str,
+    version: int,
+    language: str = "en",
+    db: AsyncSession = Depends(get_db),
+):
+    """Get a specific version of a template"""
+    try:
+        template = await TemplateRepository.get_by_template_code_version_language(
+            db, template_code, version, language
+        )
+
+        if not template:
+            raise HTTPException(
+                status_code=404, detail=f"Template version {version} not found"
+            )
+
+        # Prepare response data
+        data = await TemplateRepository.get_template_data_dict(template)
+
+        return {
+            "success": True,
+            "data": data,
+            "message": f"Template version {version} retrieved successfully",
+            "meta": None,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get template version: {e}")
         raise HTTPException(status_code=500, detail=str(e))
