@@ -1,5 +1,14 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String, Text, Integer, DateTime, Boolean, func
+from sqlalchemy import (
+    String,
+    Text,
+    Integer,
+    DateTime,
+    Boolean,
+    func,
+    UniqueConstraint,
+    Index,
+)
 from datetime import datetime
 from typing import Optional
 
@@ -11,8 +20,20 @@ class Base(DeclarativeBase):
 class Template(Base):
     __tablename__ = "templates"
 
+    __table_args__ = (
+        UniqueConstraint(
+            "template_code", "version", "language", name="uq_template_version_language"
+        ),
+        Index(
+            "idx_template_code_language_active",
+            "template_code",
+            "language",
+            "is_active",
+        ),
+    )
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    template_code: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    template_code: Mapped[str] = mapped_column(String(100), index=True)
     name: Mapped[str] = mapped_column(String(200))
     notification_type: Mapped[str] = mapped_column(String(50))
     language: Mapped[str] = mapped_column(String(10), default="en")

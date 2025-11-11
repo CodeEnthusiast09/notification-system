@@ -109,7 +109,7 @@ class TemplateRepository:
             template_code=old_template.template_code,
             name=update_data.name or old_template.name,
             notification_type=old_template.notification_type,
-            language=old_template.language,
+            language=update_data.language or old_template.language,
             version=old_template.version + 1,
             subject=(
                 update_data.subject
@@ -162,3 +162,32 @@ class TemplateRepository:
             "title": template.title,
             "variables": json.loads(template.variables),
         }
+
+    @staticmethod
+    async def get_all_versions(
+        db: AsyncSession, template_code: str, language: str
+    ) -> List[Template]:
+        """Get all versions of a template for a specific language"""
+        result = await db.execute(
+            select(Template)
+            .where(
+                Template.template_code == template_code,
+                Template.language == language,
+            )
+            .order_by(Template.version.desc())
+        )
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_by_template_code_version_language(
+        db: AsyncSession, template_code: str, version: int, language: str
+    ) -> Optional[Template]:
+        """Get a specific version of a template"""
+        result = await db.execute(
+            select(Template).where(
+                Template.template_code == template_code,
+                Template.version == version,
+                Template.language == language,
+            )
+        )
+        return result.scalar_one_or_none()
