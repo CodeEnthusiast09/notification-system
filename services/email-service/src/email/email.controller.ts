@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { ResponseHelper } from '../common/utils/response.helper';
 
-@Controller('api/email')
+@Controller('/email')
 export class EmailController {
   constructor(private emailService: EmailService) {}
 

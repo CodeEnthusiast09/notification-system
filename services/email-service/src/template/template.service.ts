@@ -54,8 +54,9 @@ export class TemplateService {
       }
 
       return template;
-    } catch (error) {
-      this.logger.error(`Failed to fetch template: ${error.message}`);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to fetch template: ${errMsg}`);
       throw error;
     }
   }
@@ -72,25 +73,34 @@ export class TemplateService {
     // Handle meta properties like {{meta.order_id}} or {{ meta.order_id }}
     if (variables.meta) {
       Object.keys(variables.meta).forEach((key) => {
+        const value = String(variables.meta?.[key]);
+
         const regex = new RegExp(`\\{\\{\\s*meta\\.${key}\\s*\\}\\}`, 'g');
-        result = result.replace(regex, String(variables.meta[key]));
+
+        result = result.replace(regex, value);
       });
     }
 
     // Also handle legacy {{variable_name}} format for backward compatibility
     // This catches any remaining variables that might be in meta
-    result = result.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
-      const trimmedKey = key.trim();
+    result = result.replace(
+      /\{\{([^}]+)\}\}/g,
+      (match: string, key: string) => {
+        const trimmedKey = key.trim();
 
-      // Check if it's a meta property
-      if (trimmedKey.startsWith('meta.')) {
-        const metaKey = trimmedKey.substring(5);
-        return variables.meta?.[metaKey] || match;
-      }
+        // Check if it's a meta property
+        if (trimmedKey && trimmedKey.startsWith('meta.')) {
+          const metaKey = trimmedKey.substring(5);
 
-      // Return original if not found
-      return match;
-    });
+          const value = String(variables.meta?.[metaKey]);
+
+          return value || match;
+        }
+
+        // Return original if not found
+        return match;
+      },
+    );
 
     return result;
   }

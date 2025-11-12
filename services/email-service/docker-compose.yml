@@ -1,4 +1,3 @@
-# docker-compose.yml (for local development without other services)
 version: '3.8'
 
 services:
@@ -12,9 +11,19 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3001
-      - RABBITMQ_HOST=host.docker.internal
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
       - TEMPLATE_SERVICE_URL=http://host.docker.internal:3004
+      - API_GATEWAY_URL=http://host.docker.internal:3000
     volumes:
       - .:/app
       - /app/node_modules
+    networks:
+      - notification-system_notif-network
     command: npm run start:dev
+
+networks:
+  notification-system_notif-network:
+    external: true

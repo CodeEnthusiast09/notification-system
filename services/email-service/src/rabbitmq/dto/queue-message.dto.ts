@@ -1,34 +1,51 @@
-import { IsString, IsObject, IsNumber, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsObject,
+  IsNumber,
+  IsEnum,
+  ValidateNested,
+  IsOptional,
+} from 'class-validator';
 import { NotificationType } from 'src/types';
+import { VariablesDto } from './variable.dto';
 
 export class QueueMessageDto {
   @IsString()
-  message_id: string;
+  notification_id: string;
 
-  @IsEnum(['email', 'push'])
+  @IsEnum(NotificationType)
   notification_type: NotificationType;
 
   @IsString()
   user_id: string;
 
   @IsString()
-  template_id: string;
+  user_email: string;
+
+  @IsString()
+  template_code: string;
 
   @IsString()
   language: string;
 
-  @IsObject()
-  variables: Record<string, any>;
+  @ValidateNested()
+  @Type(() => VariablesDto)
+  variables: VariablesDto;
 
   @IsNumber()
   priority: number;
+
+  @IsString()
+  request_id: string;
+
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, any>;
 
   @IsString()
   created_at: string;
 
   @IsNumber()
   retry_count: number;
-
-  @IsString()
-  user_email?: string;
 }

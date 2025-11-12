@@ -63,6 +63,15 @@ export interface EmailCircuitBreakerConfig {
   resetTimeout: number;
 }
 
+export interface RabbitMQConfig {
+  username: string;
+  password: string;
+  host: string;
+  port: number;
+  emailQueue: string;
+  failedQueue: string;
+}
+
 export interface SMTPConfig {
   host: string;
   port: number;
@@ -95,8 +104,6 @@ export interface User {
   push_token?: string;
   preferences: UserPreference;
   password?: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface UserPreference {

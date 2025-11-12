@@ -8,6 +8,7 @@ import emailConfig from './config/email.config';
 import rabbitmqConfig from './config/rabbitmq.config';
 import { HttpModule } from '@nestjs/axios';
 import { TerminusModule } from '@nestjs/terminus';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { TerminusModule } from '@nestjs/terminus';
     EmailModule,
     TemplateModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}

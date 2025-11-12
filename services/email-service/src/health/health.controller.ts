@@ -1,4 +1,3 @@
-// src/health/health.controller.ts
 import { Controller, Get } from '@nestjs/common';
 import {
   HealthCheck,
@@ -22,7 +21,7 @@ export class HealthController {
   async check(): Promise<HealthCheckResult> {
     return this.health.check([
       // Check RabbitMQ connection
-      async () => {
+      () => {
         const isConnected = this.rabbitMQService.isConnected();
         return {
           rabbitmq: {
@@ -42,12 +41,14 @@ export class HealthController {
       },
 
       // Check Circuit Breaker
-      async () => {
+      () => {
         const isOpen = this.emailService.isCircuitOpen();
         return {
           circuit_breaker: {
-            status: isOpen ? 'open' : 'closed',
+            // HealthIndicatorStatus expects 'up' | 'down'
+            status: isOpen ? 'down' : 'up',
             healthy: !isOpen,
+            state: isOpen ? 'open' : 'closed',
           },
         };
       },

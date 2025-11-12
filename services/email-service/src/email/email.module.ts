@@ -5,9 +5,10 @@ import { SendGridProvider } from './providers/sendgrid.provider';
 import { SMTPProvider } from './providers/smtp.provider';
 import { TemplateModule } from '../template/template.module';
 import { StatusReporterService } from 'src/common/services/status-reporter.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TemplateModule],
+  imports: [HttpModule, TemplateModule],
   providers: [
     EmailService,
     SendGridProvider,

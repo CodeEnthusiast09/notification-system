@@ -1,98 +1,244 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Email Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Microservice responsible for processing and sending email notifications.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- RabbitMQ message consumer
+- SendGrid and SMTP email providers
+- Circuit breaker pattern for fault tolerance
+- Exponential backoff retry mechanism
+- Dead letter queue for failed messages
+- Template fetching and variable substitution
+- Health check endpoints
+- Docker support
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
 
-## Project setup
+- Node.js 20+
+- RabbitMQ running
+- Template Service running
+- SendGrid API key OR SMTP credentials
+
+## Installation
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+## Configuration
 
+Copy `.env.example` to `.env` and configure:
+
+```env
+# Choose email provider
+EMAIL_PROVIDER=sendgrid  # or 'smtp'
+
+# SendGrid (if using)
+SENDGRID_API_KEY=your-key
+SENDGRID_FROM_EMAIL=noreply@yourdomain.com
+
+# SMTP (if using Gmail)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+```
+
+### Getting SendGrid API Key
+
+1. Sign up at https://sendgrid.com (free tier: 100 emails/day)
+2. Go to Settings → API Keys
+3. Create API Key with "Mail Send" permissions
+4. Copy and add to .env
+
+### Getting Gmail App Password
+
+1. Enable 2FA on your Google account
+2. Go to https://myaccount.google.com/apppasswords
+3. Generate app password for "Mail"
+4. Use this password in SMTP_PASSWORD
+
+## Running the Service
+
+### Development
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run start:dev
 ```
 
-## Run tests
-
+### Docker
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up --build
 ```
 
-## Deployment
+## API Endpoints
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Health Check
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+GET /health
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Response:
+```json
+{
+  "status": "ok",
+  "info": {
+    "rabbitmq": { "status": "up" },
+    "email_provider": { "status": "up" },
+    "circuit_breaker": { "status": "closed", "healthy": true }
+  }
+}
+```
 
-## Resources
+### Email Status
+```bash
+GET /api/email/status
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## Message Format
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The service consumes messages from `email.queue`:
 
-## Support
+```json
+{
+  "message_id": "unique-id",
+  "notification_type": "email",
+  "user_id": "user-123",
+  "user_email": "user@example.com",
+  "template_id": "welcome_email",
+  "language": "en",
+  "variables": {
+    "name": "John",
+    "order_id": "12345"
+  },
+  "priority": 1,
+  "created_at": "2025-11-10T10:00:00Z",
+  "retry_count": 0
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## How It Works
 
-## Stay in touch
+1. **Consumes messages** from RabbitMQ `email.queue`
+2. **Fetches template** from Template Service
+3. **Substitutes variables** in template ({{name}} → John)
+4. **Sends email** via SendGrid or SMTP
+5. **Handles failures** with retry logic
+6. **Moves to DLQ** after max retries
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Retry Strategy
 
-## License
+- **Max Retries**: 5 attempts
+- **Backoff**: Exponential (1s, 2s, 4s, 8s, 16s)
+- **Jitter**: Random 0-1s added to prevent thundering herd
+- **DLQ**: Failed messages after 5 attempts
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Circuit Breaker
+
+Protects against cascading failures:
+
+- **Timeout**: 3 seconds
+- **Error Threshold**: 50%
+- **Reset Timeout**: 30 seconds
+
+## Testing
+
+### Test Email Sending
+```bash
+# Send test message to queue (use API Gateway in production)
+curl -X POST http://localhost:3000/api/notifications/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "notification_type": "email",
+    "user_id": "test-user",
+    "template_id": "welcome_email",
+    "language": "en",
+    "variables": {
+      "name": "Test User"
+    }
+  }'
+```
+
+### Check Health
+```bash
+curl http://localhost:3001/health
+```
+
+## Monitoring
+
+### Logs
+```bash
+# Docker
+docker logs -f email-service
+
+# Local
+npm run start:dev
+```
+
+### Key Metrics to Watch
+- Message processing time
+- Email delivery success rate
+- Circuit breaker status
+- Dead letter queue size
+- RabbitMQ connection status
+
+## Troubleshooting
+
+### RabbitMQ Connection Failed
+- Check RabbitMQ is running: `docker ps`
+- Verify connection details in .env
+- Check RabbitMQ logs: `docker logs rabbitmq`
+
+### Emails Not Sending
+- Verify email provider credentials
+- Check circuit breaker status: `GET /api/email/status`
+- Review logs for errors
+- Test email provider directly
+
+### Template Not Found
+- Ensure Template Service is running
+- Check TEMPLATE_SERVICE_URL in .env
+- Verify template exists in Template Service
+
+## Architecture
+
+```
+         ┌─────────────┐
+         │  RabbitMQ   │
+         │ email.queue │
+         └──────┬──────┘
+                │
+                ▼
+┌─────────────────────────────────┐
+│      Email Service (NestJS)     │
+│                                 │
+│  ┌────────────────────────────┐ │
+│  │   RabbitMQ Consumer        │ │
+│  │   - Receive messages       │ │
+│  │   - Retry with backoff     │ │
+│  └─────────┬──────────────────┘ │
+│            │                    │
+│            ▼                    │
+│  ┌────────────────────────────┐ │
+│  │   Template Service Client  │ │
+│  │   - Fetch template         │ │
+│  │   - Substitute variables   │ │
+│  └─────────┬──────────────────┘ │
+│            │                    │
+│            ▼                    │
+│  ┌────────────────────────────┐ │
+│  │   Circuit Breaker          │ │
+│  └─────────┬──────────────────┘ │
+│            │                    │
+│            ▼                    │
+│  ┌────────────────────────────┐ │
+│  │   Email Provider           │ │
+│  │   - SendGrid OR SMTP       │ │
+│  └────────────────────────────┘ │
+└─────────────────────────────────┘
+```
+
+## Team
+Developed by: [O'Brien]
+Technology: NestJS
+```
