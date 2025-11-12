@@ -34,19 +34,19 @@ REDIS_URL = os.getenv("REDIS_URL")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SERVICE_ACCOUNT_FILE_BASE64 = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if SERVICE_ACCOUNT_FILE_BASE64:
-    SERVICE_ACCOUNT_FILE_JSON = base64.b64decode(SERVICE_ACCOUNT_FILE_BASE64).decode(
-        "utf-8"
-    )
-    SERVICE_ACCOUNT_FILE = json.loads(SERVICE_ACCOUNT_FILE_JSON)
+SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+# if SERVICE_ACCOUNT_FILE_BASE64:
+#     SERVICE_ACCOUNT_FILE_JSON = base64.b64decode(SERVICE_ACCOUNT_FILE_BASE64).decode(
+#         "utf-8"
+#     )
+#     SERVICE_ACCOUNT_FILE = json.loads(SERVICE_ACCOUNT_FILE_JSON)
 
 
 PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID")
 FCM_V1_URL = f"https://fcm.googleapis.com/v1/projects/{PROJECT_ID}/messages:send"
 
 SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
-credentials = service_account.Credentials.from_service_account_info(
+credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
 )
 

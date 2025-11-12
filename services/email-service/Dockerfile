@@ -1,24 +1,24 @@
-FROM node:20-alpine
-
+# Stage 1: Builder
+FROM node:18 AS builder
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source code
+RUN npm install
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Install only production dependencies
-RUN npm ci --omit=dev
+# Stage 2: Production
+FROM node:18-alpine AS production
+WORKDIR /app
 
-# Expose port
+COPY package*.json ./
+RUN npm ci --omit=dev || npm install --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+
 EXPOSE 3001
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/api/health', res => process.exit(res.statusCode === 200 ? 0 : 1))"
 
-# Start in production mode
 CMD ["node", "dist/main"]
