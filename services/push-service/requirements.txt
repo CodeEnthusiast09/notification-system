@@ -16,5 +16,4 @@ pytest-cov
 pytest-mock
 faker
 psycopg2-binary
-psycopg2
 psycopg
