@@ -109,7 +109,7 @@ services:
       RABBITMQ_EMAIL_QUEUE: email.queue
       RABBITMQ_FAILED_QUEUE: failed.queue
       EMAIL_PROVIDER: sendgrid
-      SENDGRID_API_KEY: SG.BNveDFG1SLagR_qvi1DaWg.           YT2FM8OkRdRCgmf6jRT4f7G8e5T6-f8XswIQBLc3RBo
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
       SENDGRID_FROM_EMAIL: obrienadedapo15@gmail.com
       SENDGRID_FROM_NAME: "Group 43 Notification System"
       TEMPLATE_SERVICE_URL: http://template-service:3004
