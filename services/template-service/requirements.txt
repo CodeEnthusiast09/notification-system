@@ -9,3 +9,6 @@ alembic
 python-multipart
 pytest
 psycopg[binary]
+psycopg2-binary
+psycopg2
+psycopg
