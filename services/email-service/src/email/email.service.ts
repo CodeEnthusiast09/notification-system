@@ -76,8 +76,6 @@ export class EmailService {
   async processEmailNotification(message: QueueMessage): Promise<void> {
     const startTime = Date.now();
 
-    console.log({ message });
-
     this.logger.log(
       `Processing email notification ${message.notification_id} for user ${message.user_id}`,
     );
