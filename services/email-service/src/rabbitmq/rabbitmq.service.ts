@@ -56,7 +56,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
     this.connection = amqp.connect([url], {
       heartbeatIntervalInSeconds: 30,
       reconnectTimeInSeconds: 5,
-      connectionOptions: { rejectUnauthorized: false },
+      connectionOptions: { rejectUnauthorized: true },
     });
 
     this.connection.on('connect', () => {
