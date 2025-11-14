@@ -9,7 +9,7 @@ export interface UserPreferences {
 export interface UserServiceUser {
   user_id: string;
   name: string;
-  user_email: string;
+  email: string;
   push_token?: string | null;
   preferences: UserPreferences;
 }

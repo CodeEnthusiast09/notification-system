@@ -61,7 +61,7 @@ export class NotificationService {
       request_id: notification.request_id,
       notification_type: notification.notification_type,
       user_id: notification.user_id,
-      email: user.user_email,
+      email: user.email,
       language: req.language ?? 'en',
       push_token: user.push_token ?? null,
       template_code: req.template_code,
