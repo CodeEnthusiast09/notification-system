@@ -42,7 +42,7 @@ export const validationSchema = Joi.object({
   // Retry / Circuit Breaker
   MAX_RETRIES: Joi.number().default(5),
   RETRY_DELAY_MS: Joi.number().default(1000),
-  CIRCUIT_BREAKER_TIMEOUT: Joi.number().default(10000),
+  CIRCUIT_BREAKER_TIMEOUT: Joi.number().default(30000),
   CIRCUIT_BREAKER_ERROR_THRESHOLD: Joi.number().default(50),
   CIRCUIT_BREAKER_RESET_TIMEOUT: Joi.number().default(30000),
 });
